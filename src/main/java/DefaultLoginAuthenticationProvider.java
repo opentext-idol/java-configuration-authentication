@@ -7,22 +7,25 @@ import com.hp.autonomy.frontend.configuration.AuthenticationConfig;
 import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.frontend.configuration.LoginTypes;
 import com.hp.autonomy.frontend.configuration.UsernameAndPassword;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
 
-@Service
 public class DefaultLoginAuthenticationProvider implements AuthenticationProvider {
 
-    @Autowired
-    private ConfigService<? extends AuthenticationConfig<?>> configService;
+    private final String roleDefault;
+
+    private final ConfigService<? extends AuthenticationConfig<?>> configService;
+
+    public DefaultLoginAuthenticationProvider(final ConfigService<? extends AuthenticationConfig<?>> configService, final String roleDefault) {
+        this.roleDefault = roleDefault;
+        this.configService = configService;
+    }
 
     @Override
     public Authentication authenticate(final Authentication authentication) throws AuthenticationException {
@@ -38,7 +41,7 @@ public class DefaultLoginAuthenticationProvider implements AuthenticationProvide
         final String password = authentication.getCredentials().toString();
 
         if(defaultLogin.getUsername().equals(username) && defaultLogin.getPassword().equals(password)) {
-            return new UsernamePasswordAuthenticationToken(username, password, Arrays.asList(new SimpleGrantedAuthority("ROLE_DEFAULT")));
+            return new UsernamePasswordAuthenticationToken(username, password, Arrays.asList(new SimpleGrantedAuthority(roleDefault)));
         }
         else {
             throw new BadCredentialsException("Access is denied");
