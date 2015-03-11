@@ -5,15 +5,20 @@
 
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
-import org.springframework.stereotype.Service;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-@Service
 public class FindAccessDeniedHandler implements AccessDeniedHandler {
+
+    private final String loginPage;
+
+    public FindAccessDeniedHandler(final String loginPage) {
+        this.loginPage = loginPage;
+    }
+
     @Override
     public void handle(final HttpServletRequest request, final HttpServletResponse response, final AccessDeniedException e) throws IOException, ServletException {
         // if AJAX, add 403 to the response, otherwise redirect to the given page
@@ -21,8 +26,7 @@ public class FindAccessDeniedHandler implements AccessDeniedHandler {
             response.sendError(HttpServletResponse.SC_FORBIDDEN, "Blocked by " + this.getClass().getName());
         }
         else {
-            // TODO parameterize this
-            response.sendRedirect(request.getContextPath() + "/loginPage");
+            response.sendRedirect(request.getContextPath() + '/' + loginPage);
         }
     }
 }
