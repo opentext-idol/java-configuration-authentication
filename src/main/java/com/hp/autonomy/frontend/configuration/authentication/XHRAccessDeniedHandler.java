@@ -12,11 +12,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-public class FindAccessDeniedHandler implements AccessDeniedHandler {
+public class XhrAccessDeniedHandler implements AccessDeniedHandler {
 
     private final String loginPage;
 
-    public FindAccessDeniedHandler(final String loginPage) {
+    public XhrAccessDeniedHandler(final String loginPage) {
         this.loginPage = loginPage;
     }
 
