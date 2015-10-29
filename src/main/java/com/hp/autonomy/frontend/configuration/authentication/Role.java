@@ -5,25 +5,22 @@
 
 package com.hp.autonomy.frontend.configuration.authentication;
 
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 
 import java.util.HashSet;
 import java.util.Set;
 
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Data
 public class Role {
 
-    @Getter
     private final String name;
-
-    @Getter
     private final Set<String> privileges;
-
-    @Getter
     private final Set<Role> parent;
-
-    @Getter
     private final String sessionAttribute;
 
     public Role getParent(final String roleName){
@@ -81,5 +78,20 @@ public class Role {
         }
 
         this.getRecursiveAncestors(role.getParent(), ancestors);
+    }
+
+    @Setter
+    @Accessors(chain = true)
+    public static class Builder {
+
+        private String name;
+        private Set<String> privileges = new HashSet<>();
+        private Set<Role> parent = new HashSet<>();
+        private String sessionAttribute;
+
+        public Role build() {
+            return new Role(name, privileges, parent, sessionAttribute);
+        }
+
     }
 }

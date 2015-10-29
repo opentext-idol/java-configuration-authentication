@@ -1,4 +1,9 @@
-package com.autonomy.login.role;
+/*
+ * Copyright 2014-2015 Hewlett-Packard Development Company, L.P.
+ * Licensed under the MIT License (the "License"); you may not use this file except in compliance with the License.
+ */
+
+package com.hp.autonomy.frontend.configuration.authentication;
 
 import org.junit.Test;
 
@@ -11,11 +16,25 @@ public class RoleTest {
 
     @Test
     public void testDiamondRoles() throws Exception {
-        final Role user = new RoleFactory().setName("user").getObject();
-        final Role admin = new RoleFactory().setName("admin").getObject();
-        final Role useradmin = new RoleFactory().setName("useradmin").getObject();
-        final Role superadmin = new RoleFactory().setName("superadmin").getObject();
-        final Role devil = new RoleFactory().setName("devil").getObject();
+        final Role user = new Role.Builder()
+            .setName("user")
+            .build();
+
+        final Role admin = new Role.Builder()
+            .setName("admin")
+            .build();
+
+        final Role useradmin = new Role.Builder()
+            .setName("useradmin")
+            .build();
+
+        final Role superadmin = new Role.Builder()
+            .setName("superadmin")
+            .build();
+
+        final Role devil = new Role.Builder()
+            .setName("devil")
+            .build();
 
         admin.getParent().add(superadmin);
         admin.getParent().add(useradmin);
@@ -36,9 +55,17 @@ public class RoleTest {
 
     @Test
     public void testStraightRoles() throws Exception {
-        final Role user = new RoleFactory().setName("user").getObject();
-        final Role admin = new RoleFactory().setName("admin").getObject();
-        final Role useradmin = new RoleFactory().setName("useradmin").getObject();
+        final Role user = new Role.Builder()
+            .setName("user")
+            .build();
+
+        final Role admin = new Role.Builder()
+            .setName("admin")
+            .build();
+
+        final Role useradmin = new Role.Builder()
+            .setName("useradmin")
+            .build();
 
         useradmin.getParent().add(admin);
         user.getParent().add(useradmin);
@@ -53,11 +80,25 @@ public class RoleTest {
 
     @Test
     public void testKiteRoles() throws Exception {
-        final Role user = new RoleFactory().setName("user").getObject();
-        final Role superuser = new RoleFactory().setName("superuser").getObject();
-        final Role admin = new RoleFactory().setName("admin").getObject();
-        final Role useradmin = new RoleFactory().setName("useradmin").getObject();
-        final Role superadmin = new RoleFactory().setName("superadmin").getObject();
+        final Role user = new Role.Builder()
+            .setName("user")
+            .build();
+
+        final Role superuser = new Role.Builder()
+            .setName("superuser")
+            .build();
+
+        final Role admin = new Role.Builder()
+            .setName("admin")
+            .build();
+
+        final Role useradmin = new Role.Builder()
+            .setName("useradmin")
+            .build();
+
+        final Role superadmin = new Role.Builder()
+            .setName("superadmin")
+            .build();
 
         user.getParent().add(superuser);
         superuser.getParent().add(useradmin);
@@ -82,11 +123,30 @@ public class RoleTest {
 
     @Test
     public void testKiteRolesPrivileges() throws Exception {
-        final Role user = new RoleFactory().setName("user").setPrivileges(new HashSet<>(Arrays.asList("read", "execute"))).getObject();
-        final Role superuser = new RoleFactory().setName("superuser").setPrivileges(new HashSet<>(Arrays.asList("write", "read", "execute"))).getObject();
-        final Role admin = new RoleFactory().setName("admin").setPrivileges(new HashSet<>(Arrays.asList("create", "read", "execute", "write"))).getObject();
-        final Role useradmin = new RoleFactory().setName("useradmin").setPrivileges(new HashSet<>(Arrays.asList("create", "read", "execute", "write"))).getObject();
-        final Role superadmin = new RoleFactory().setName("superadmin").setPrivileges(new HashSet<>(Arrays.asList("create", "read", "execute", "write", "kill"))).getObject();
+        final Role user = new Role.Builder()
+            .setName("user")
+            .setPrivileges(new HashSet<>(Arrays.asList("read", "execute")))
+            .build();
+
+        final Role superuser = new Role.Builder()
+            .setName("superuser")
+            .setPrivileges(new HashSet<>(Arrays.asList("write", "read", "execute")))
+            .build();
+
+        final Role admin = new Role.Builder()
+            .setName("admin")
+            .setPrivileges(new HashSet<>(Arrays.asList("create", "read", "execute", "write")))
+            .build();
+
+        final Role useradmin = new Role.Builder()
+            .setName("useradmin")
+            .setPrivileges(new HashSet<>(Arrays.asList("create", "read", "execute", "write")))
+            .build();
+
+        final Role superadmin = new Role.Builder()
+            .setName("superadmin")
+            .setPrivileges(new HashSet<>(Arrays.asList("create", "read", "execute", "write", "kill")))
+            .build();
 
         superuser.getParent().add(useradmin);
         superuser.getParent().add(admin);

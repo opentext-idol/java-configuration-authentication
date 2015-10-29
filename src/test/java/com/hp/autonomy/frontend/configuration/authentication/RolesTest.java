@@ -1,4 +1,9 @@
-package com.autonomy.login.role;
+/*
+ * Copyright 2014-2015 Hewlett-Packard Development Company, L.P.
+ * Licensed under the MIT License (the "License"); you may not use this file except in compliance with the License.
+ */
+
+package com.hp.autonomy.frontend.configuration.authentication;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -16,11 +21,11 @@ public class RolesTest {
     public void setUp() throws Exception {
         roles = new Roles();
 
-        final Role user = new RoleFactory().setName("user").setPrivileges(new HashSet<>(Arrays.asList("read", "execute"))).getObject();
-        final Role superuser = new RoleFactory().setName("superuser").setPrivileges(new HashSet<>(Arrays.asList("read", "execute", "write"))).getObject();
-        final Role admin = new RoleFactory().setName("admin").setPrivileges(new HashSet<>(Arrays.asList("read", "execute", "write", "create", "delete"))).getObject();
-        final Role useradmin = new RoleFactory().setName("useradmin").setPrivileges(new HashSet<>(Arrays.asList("read", "execute", "create", "destroy"))).getObject();
-        final Role loner = new RoleFactory().setName("loner").setPrivileges(new HashSet<>(Arrays.asList("think", "meditate", "thinkagain", "shout"))).getObject();
+        final Role user = new Role.Builder().setName("user").setPrivileges(new HashSet<>(Arrays.asList("read", "execute"))).build();
+        final Role superuser = new Role.Builder().setName("superuser").setPrivileges(new HashSet<>(Arrays.asList("read", "execute", "write"))).build();
+        final Role admin = new Role.Builder().setName("admin").setPrivileges(new HashSet<>(Arrays.asList("read", "execute", "write", "create", "delete"))).build();
+        final Role useradmin = new Role.Builder().setName("useradmin").setPrivileges(new HashSet<>(Arrays.asList("read", "execute", "create", "destroy"))).build();
+        final Role loner = new Role.Builder().setName("loner").setPrivileges(new HashSet<>(Arrays.asList("think", "meditate", "thinkagain", "shout"))).build();
 
         user.getParent().add(superuser);
         superuser.getParent().add(useradmin);
