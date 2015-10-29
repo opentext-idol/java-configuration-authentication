@@ -3,19 +3,16 @@
  * Licensed under the MIT License (the "License"); you may not use this file except in compliance with the License.
  */
 
-package com.hp.autonomy.frontend.abc.authentication;
+package com.hp.autonomy.frontend.configuration.authentication;
 
 import com.autonomy.aci.client.services.AciErrorException;
 import com.autonomy.aci.client.services.AciServiceException;
-import com.autonomy.login.role.Roles;
-import com.autonomy.user.admin.UserAdmin;
-import com.autonomy.user.admin.dto.UserRoles;
-import com.google.common.base.Function;
-import com.google.common.collect.Lists;
 import com.hp.autonomy.frontend.configuration.AuthenticationConfig;
 import com.hp.autonomy.frontend.configuration.CommunityAuthentication;
 import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.frontend.configuration.LoginTypes;
+import com.hp.autonomy.user.UserService;
+import com.hp.autonomy.user.dto.UserRoles;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
@@ -26,8 +23,10 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -35,20 +34,20 @@ import java.util.Set;
  */
 public class CommunityAuthenticationProvider implements AuthenticationProvider {
     private final ConfigService<? extends AuthenticationConfig<?>> configService;
-    private final UserAdmin userAdmin;
+    private final UserService userService;
     private final Roles roles;
     private final Set<String> loginPrivileges;
     private final GrantedAuthoritiesMapper authoritiesMapper;
 
     public CommunityAuthenticationProvider(
-            final ConfigService<? extends AuthenticationConfig<?>> configService,
-            final UserAdmin userAdmin,
-            final Roles roles,
-            final Set<String> loginPrivileges,
-            final GrantedAuthoritiesMapper authoritiesMapper
+        final ConfigService<? extends AuthenticationConfig<?>> configService,
+        final UserService userService,
+        final Roles roles,
+        final Set<String> loginPrivileges,
+        final GrantedAuthoritiesMapper authoritiesMapper
     ) {
         this.configService = configService;
-        this.userAdmin = userAdmin;
+        this.userService = userService;
         this.roles = roles;
         this.loginPrivileges = loginPrivileges;
         this.authoritiesMapper = authoritiesMapper;
@@ -67,24 +66,25 @@ public class CommunityAuthenticationProvider implements AuthenticationProvider {
         final String password = authentication.getCredentials().toString();
 
         try {
-            final boolean isAuthenticated = userAdmin.authenticateUser(username, password, authenticationMethod);
+            final boolean isAuthenticated = userService.authenticateUser(username, password, authenticationMethod);
 
             if (!isAuthenticated) {
                 throw new BadCredentialsException("Bad credentials");
             }
 
-            final UserRoles userRoles = userAdmin.getUser(username);
+            final UserRoles userRoles = userService.getUser(username);
 
             if (!roles.areRolesAuthorized(new HashSet<>(userRoles.getRoles()), loginPrivileges)) {
                 throw new BadCredentialsException("Bad credentials");
             }
 
-            final Collection<? extends GrantedAuthority> mappedAuthorities = authoritiesMapper.mapAuthorities(Lists.transform(userRoles.getRoles(), new Function<String, GrantedAuthority>() {
-                @Override
-                public GrantedAuthority apply(final String role) {
-                    return new SimpleGrantedAuthority(role);
-                }
-            }));
+            final List<GrantedAuthority> grantedAuthorities = new ArrayList<>();
+
+            for (final String role : userRoles.getRoles()) {
+                grantedAuthorities.add(new SimpleGrantedAuthority(role));
+            }
+
+            final Collection<? extends GrantedAuthority> mappedAuthorities = authoritiesMapper.mapAuthorities(grantedAuthorities);
 
             return new UsernamePasswordAuthenticationToken(username, password, mappedAuthorities);
         } catch (final AciErrorException aciError) {
