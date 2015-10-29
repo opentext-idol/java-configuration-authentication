@@ -5,11 +5,17 @@
 
 package com.hp.autonomy.frontend.configuration.authentication;
 
+import org.hamcrest.BaseMatcher;
+import org.hamcrest.Description;
+import org.hamcrest.Factory;
 import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.HashSet;
 
+import static com.hp.autonomy.frontend.configuration.authentication.RoleTest.AuthorizedMatcher.isAuthorizedFor;
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.*;
 
 public class RoleTest {
@@ -41,16 +47,16 @@ public class RoleTest {
         superadmin.getParent().add(devil);
         useradmin.getParent().add(devil);
 
-        assertEquals(0, user.getParent().size());
-        assertEquals(0, user.getAncestors().size());
-        assertEquals(2, admin.getParent().size());
-        assertEquals(3, admin.getAncestors().size());
-        assertEquals(1, useradmin.getParent().size());
-        assertEquals(1, useradmin.getAncestors().size());
-        assertEquals(1, superadmin.getParent().size());
-        assertEquals(1, superadmin.getAncestors().size());
-        assertEquals(0, devil.getParent().size());
-        assertEquals(0, devil.getAncestors().size());
+        assertThat(user.getParent(), hasSize(0));
+        assertThat(user.getAncestors(), hasSize(0));
+        assertThat(admin.getParent(), hasSize(2));
+        assertThat(admin.getAncestors(), hasSize(3));
+        assertThat(useradmin.getParent(), hasSize(1));
+        assertThat(useradmin.getAncestors(), hasSize(1));
+        assertThat(superadmin.getParent(), hasSize(1));
+        assertThat(superadmin.getAncestors(), hasSize(1));
+        assertThat(devil.getParent(), hasSize(0));
+        assertThat(devil.getAncestors(), hasSize(0));
     }
 
     @Test
@@ -70,12 +76,12 @@ public class RoleTest {
         useradmin.getParent().add(admin);
         user.getParent().add(useradmin);
 
-        assertEquals(1, user.getParent().size());
-        assertEquals(2, user.getAncestors().size());
-        assertEquals(0, admin.getParent().size());
-        assertEquals(0, admin.getAncestors().size());
-        assertEquals(1, useradmin.getParent().size());
-        assertEquals(1, useradmin.getAncestors().size());
+        assertThat(user.getParent(), hasSize(1));
+        assertThat(user.getAncestors(), hasSize(2));
+        assertThat(admin.getParent(), hasSize(0));
+        assertThat(admin.getAncestors(), hasSize(0));
+        assertThat(useradmin.getParent(), hasSize(1));
+        assertThat(useradmin.getAncestors(), hasSize(1));
     }
 
     @Test
@@ -105,16 +111,16 @@ public class RoleTest {
         superuser.getParent().add(admin);
         admin.getParent().add(superadmin);
 
-        assertEquals(1, user.getParent().size());
-        assertEquals(4, user.getAncestors().size());
-        assertEquals(1, admin.getParent().size());
-        assertEquals(1, admin.getAncestors().size());
-        assertEquals(0, useradmin.getParent().size());
-        assertEquals(0, useradmin.getAncestors().size());
-        assertEquals(0, superadmin.getParent().size());
-        assertEquals(0, superadmin.getAncestors().size());
-        assertEquals(2, superuser.getParent().size());
-        assertEquals(3, superuser.getAncestors().size());
+        assertThat(user.getParent(), hasSize(1));
+        assertThat(user.getAncestors(), hasSize(4));
+        assertThat(admin.getParent(), hasSize(1));
+        assertThat(admin.getAncestors(), hasSize(1));
+        assertThat(useradmin.getParent(), hasSize(0));
+        assertThat(useradmin.getAncestors(), hasSize(0));
+        assertThat(superadmin.getParent(), hasSize(0));
+        assertThat(superadmin.getAncestors(), hasSize(0));
+        assertThat(superuser.getParent(), hasSize(2));
+        assertThat(superuser.getAncestors(), hasSize(3));
 
         assertEquals("admin", superuser.getParent("admin").getName());
         assertNull(superuser.getParent("ADMIN"));
@@ -152,25 +158,60 @@ public class RoleTest {
         superuser.getParent().add(admin);
         admin.getParent().add(superadmin);
 
-        assertTrue(user.isAuthorized("read"));
-        assertFalse(user.isAuthorized("create"));
-        assertTrue(superuser.isAuthorized("read"));
-        assertTrue(superuser.isAuthorized("write"));
-        assertTrue(superuser.isAuthorized("execute"));
-        assertTrue(superuser.isAuthorized("create"));
-        assertTrue(superuser.isAuthorized("kill"));
-        assertFalse(useradmin.isAuthorized("kill"));
-        assertTrue(useradmin.isAuthorized("create"));
-        assertTrue(useradmin.isAuthorized("read"));
-        assertTrue(useradmin.isAuthorized("execute"));
+        assertThat(user, isAuthorizedFor("read"));
+        assertThat(user, not(isAuthorizedFor("create")));
+        assertThat(superuser, isAuthorizedFor("read"));
+        assertThat(superuser, isAuthorizedFor("write"));
+        assertThat(superuser, isAuthorizedFor("execute"));
+        assertThat(superuser, isAuthorizedFor("create"));
+        assertThat(superuser, isAuthorizedFor("kill"));
+        assertThat(useradmin, not(isAuthorizedFor("kill")));
+        assertThat(useradmin, isAuthorizedFor("create"));
+        assertThat(useradmin, isAuthorizedFor("read"));
+        assertThat(useradmin, isAuthorizedFor("execute"));
 
-        assertTrue(user.isAuthorized(new HashSet<>(Arrays.asList("read", "execute"))));
-        assertFalse(user.isAuthorized(new HashSet<>(Arrays.asList("read", "execute", "create"))));
-        assertTrue(superuser.isAuthorized(new HashSet<>(Arrays.asList("write", "read"))));
-        assertFalse(superuser.isAuthorized(new HashSet<>(Arrays.asList("create", "read", "execute", "write", "die"))));
-        assertTrue(useradmin.isAuthorized(new HashSet<>(Arrays.asList("create", "read", "execute", "write"))));
-        assertFalse(useradmin.isAuthorized(new HashSet<>(Arrays.asList("create", "kill"))));
-        assertTrue(admin.isAuthorized(new HashSet<>(Arrays.asList("read", "execute"))));
-        assertFalse(admin.isAuthorized(new HashSet<>(Arrays.asList("read", "execute", "die"))));
+        assertThat(user, isAuthorizedFor("read", "execute"));
+        assertThat(user, not(isAuthorizedFor("read", "execute", "create")));
+        assertThat(superuser, isAuthorizedFor("write", "read"));
+        assertThat(superuser, not(isAuthorizedFor("create", "read", "execute", "write", "die")));
+        assertThat(useradmin, isAuthorizedFor("create", "read", "execute", "write"));
+        assertThat(useradmin, not(isAuthorizedFor("create", "kill")));
+        assertThat(admin, isAuthorizedFor("read", "execute"));
+        assertThat(admin, not(isAuthorizedFor("read", "execute", "die")));
+    }
+
+    static class AuthorizedMatcher extends BaseMatcher<Role> {
+
+        private final String[] privileges;
+
+        public AuthorizedMatcher(final String... privilege) {
+            this.privileges = privilege;
+        }
+
+        @Factory
+        static AuthorizedMatcher isAuthorizedFor(final String... privileges) {
+            return new AuthorizedMatcher(privileges);
+        }
+
+        @Override
+        public boolean matches(final Object item) {
+            if(!(item instanceof Role)) {
+                return false;
+            }
+
+            final Role role = (Role) item;
+
+            if(privileges.length == 1) {
+                return role.isAuthorized(privileges[0]);
+            }
+            else {
+                return role.isAuthorized(new HashSet<>(Arrays.asList(privileges)));
+            }
+        }
+
+        @Override
+        public void describeTo(final Description description) {
+            description.appendText(" a role authorized for ").appendText(Arrays.toString(privileges));
+        }
     }
 }
