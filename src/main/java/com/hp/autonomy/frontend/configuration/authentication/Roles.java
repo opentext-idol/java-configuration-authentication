@@ -6,20 +6,16 @@
 package com.hp.autonomy.frontend.configuration.authentication;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.Data;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+@Data
 @AllArgsConstructor
-@NoArgsConstructor
 public class Roles {
 
-    @Getter
-    @Setter
     private List<Role> roles = new ArrayList<>();
 
     public Role getRole(final String name){
