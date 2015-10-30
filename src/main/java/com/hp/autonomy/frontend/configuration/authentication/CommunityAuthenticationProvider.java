@@ -39,6 +39,14 @@ public class CommunityAuthenticationProvider implements AuthenticationProvider {
     private final Set<String> loginPrivileges;
     private final GrantedAuthoritiesMapper authoritiesMapper;
 
+    /**
+     *
+     * @param configService The configuration service used for authentication
+     * @param userService The user service used to interact with Community
+     * @param roles The list of Community roles used by the application
+     * @param loginPrivileges The list of privileges a role must have to be allowed to log in to the application
+     * @param authoritiesMapper Mapper used to convert Community roles into GrantedAuthorities
+     */
     public CommunityAuthenticationProvider(
         final ConfigService<? extends AuthenticationConfig<?>> configService,
         final UserService userService,
