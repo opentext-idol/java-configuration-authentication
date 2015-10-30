@@ -40,7 +40,7 @@ public class CommunityAuthenticationProvider implements AuthenticationProvider {
     private final GrantedAuthoritiesMapper authoritiesMapper;
 
     /**
-     *
+     * Creates a new CommunityAuthenticationProvider
      * @param configService The configuration service used for authentication
      * @param userService The user service used to interact with Community
      * @param roles The list of Community roles used by the application
