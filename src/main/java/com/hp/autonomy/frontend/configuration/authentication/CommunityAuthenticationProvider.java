@@ -11,8 +11,8 @@ import com.hp.autonomy.frontend.configuration.AuthenticationConfig;
 import com.hp.autonomy.frontend.configuration.CommunityAuthentication;
 import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.frontend.configuration.LoginTypes;
+import com.hp.autonomy.user.UserRoles;
 import com.hp.autonomy.user.UserService;
-import com.hp.autonomy.user.dto.UserRoles;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
@@ -26,11 +26,11 @@ import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMap
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 /**
- * A Spring Security {@link org.springframework.security.authentication.AuthenticationProvider} backed by IDOL community.
+ * A Spring Security {@link AuthenticationProvider} backed by IDOL community.
  */
 public class CommunityAuthenticationProvider implements AuthenticationProvider {
     private final ConfigService<? extends AuthenticationConfig<?>> configService;
@@ -41,18 +41,19 @@ public class CommunityAuthenticationProvider implements AuthenticationProvider {
 
     /**
      * Creates a new CommunityAuthenticationProvider
-     * @param configService The configuration service used for authentication
-     * @param userService The user service used to interact with Community
-     * @param roles The list of Community roles used by the application
-     * @param loginPrivileges The list of privileges a role must have to be allowed to log in to the application
+     *
+     * @param configService     The configuration service used for authentication
+     * @param userService       The user service used to interact with Community
+     * @param roles             The list of Community roles used by the application
+     * @param loginPrivileges   The list of privileges a role must have to be allowed to log in to the application
      * @param authoritiesMapper Mapper used to convert Community roles into GrantedAuthorities
      */
     public CommunityAuthenticationProvider(
-        final ConfigService<? extends AuthenticationConfig<?>> configService,
-        final UserService userService,
-        final Roles roles,
-        final Set<String> loginPrivileges,
-        final GrantedAuthoritiesMapper authoritiesMapper
+            final ConfigService<? extends AuthenticationConfig<?>> configService,
+            final UserService userService,
+            final Roles roles,
+            final Set<String> loginPrivileges,
+            final GrantedAuthoritiesMapper authoritiesMapper
     ) {
         this.configService = configService;
         this.userService = userService;
@@ -86,7 +87,7 @@ public class CommunityAuthenticationProvider implements AuthenticationProvider {
                 throw new BadCredentialsException("Bad credentials");
             }
 
-            final List<GrantedAuthority> grantedAuthorities = new ArrayList<>();
+            final Collection<GrantedAuthority> grantedAuthorities = new ArrayList<>();
 
             for (final String role : userRoles.getRoles()) {
                 grantedAuthorities.add(new SimpleGrantedAuthority(role));
@@ -94,7 +95,7 @@ public class CommunityAuthenticationProvider implements AuthenticationProvider {
 
             final Collection<? extends GrantedAuthority> mappedAuthorities = authoritiesMapper.mapAuthorities(grantedAuthorities);
 
-            return new UsernamePasswordAuthenticationToken(new CommunityPrincipal(userRoles.getUid(), username), password, mappedAuthorities);
+            return new UsernamePasswordAuthenticationToken(new CommunityPrincipal(userRoles.getUid(), username, userRoles.getSecurityInfo()), password, mappedAuthorities);
         } catch (final AciErrorException aciError) {
             // This should not happen
             throw new InternalAuthenticationServiceException("An ACI error occurred while attempting to authenticate", aciError);
@@ -106,6 +107,6 @@ public class CommunityAuthenticationProvider implements AuthenticationProvider {
 
     @Override
     public boolean supports(final Class<?> authenticationClass) {
-        return authenticationClass == UsernamePasswordAuthenticationToken.class;
+        return Objects.equals(authenticationClass, UsernamePasswordAuthenticationToken.class);
     }
 }

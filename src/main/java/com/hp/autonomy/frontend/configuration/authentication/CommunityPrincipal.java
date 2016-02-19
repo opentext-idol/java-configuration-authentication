@@ -13,6 +13,7 @@ import java.security.Principal;
 public class CommunityPrincipal implements Principal {
     private final long id;
     private final String username;
+    private final String securityInfo;
 
     @Override
     public String getName() {
