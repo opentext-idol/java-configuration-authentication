@@ -7,12 +7,16 @@ package com.hp.autonomy.frontend.configuration.authentication;
 
 import lombok.Data;
 
+import java.io.Serializable;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 
+@SuppressWarnings("WeakerAccess")
 @Data
-public class CommunityPrincipal implements Principal {
+public class CommunityPrincipal implements Principal, Serializable {
+    private static final long serialVersionUID = -8625590848187633506L;
+
     private final long id;
     private final String username;
     @SuppressWarnings("MismatchedQueryAndUpdateOfCollection")
