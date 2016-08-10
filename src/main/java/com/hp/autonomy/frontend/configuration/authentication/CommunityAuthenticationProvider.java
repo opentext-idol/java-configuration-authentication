@@ -95,7 +95,7 @@ public class CommunityAuthenticationProvider implements AuthenticationProvider {
 
             final Collection<? extends GrantedAuthority> mappedAuthorities = authoritiesMapper.mapAuthorities(grantedAuthorities);
 
-            return new UsernamePasswordAuthenticationToken(new CommunityPrincipal(userRoles.getUid(), username, userRoles.getRoles(), userRoles.getSecurityInfo()), password, mappedAuthorities);
+            return new UsernamePasswordAuthenticationToken(new CommunityPrincipal(userRoles.getUid(), username, userRoles.getSecurityInfo()), password, mappedAuthorities);
         } catch (final AciErrorException aciError) {
             // This should not happen
             throw new InternalAuthenticationServiceException("An ACI error occurred while attempting to authenticate", aciError);
