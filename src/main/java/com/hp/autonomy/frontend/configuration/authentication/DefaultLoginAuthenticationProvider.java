@@ -4,10 +4,8 @@
  */
 package com.hp.autonomy.frontend.configuration.authentication;
 
-import com.hp.autonomy.frontend.configuration.AuthenticationConfig;
 import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.frontend.configuration.LoginTypes;
-import com.hp.autonomy.frontend.configuration.UsernameAndPassword;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -30,7 +28,7 @@ public class DefaultLoginAuthenticationProvider implements AuthenticationProvide
 
     @Override
     public Authentication authenticate(final Authentication authentication) throws AuthenticationException {
-        final com.hp.autonomy.frontend.configuration.Authentication<?> authenticationConfig = configService.getConfig().getAuthentication();
+        final com.hp.autonomy.frontend.configuration.authentication.Authentication<?> authenticationConfig = configService.getConfig().getAuthentication();
 
         if(!LoginTypes.DEFAULT.equalsIgnoreCase(authenticationConfig.getMethod())) {
             return null;

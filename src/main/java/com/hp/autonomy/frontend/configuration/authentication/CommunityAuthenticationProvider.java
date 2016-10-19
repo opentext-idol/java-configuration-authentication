@@ -7,8 +7,6 @@ package com.hp.autonomy.frontend.configuration.authentication;
 
 import com.autonomy.aci.client.services.AciErrorException;
 import com.autonomy.aci.client.services.AciServiceException;
-import com.hp.autonomy.frontend.configuration.AuthenticationConfig;
-import com.hp.autonomy.frontend.configuration.CommunityAuthentication;
 import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.frontend.configuration.LoginTypes;
 import com.hp.autonomy.user.UserRoles;
@@ -64,7 +62,7 @@ public class CommunityAuthenticationProvider implements AuthenticationProvider {
 
     @Override
     public Authentication authenticate(final Authentication authentication) throws AuthenticationException {
-        final com.hp.autonomy.frontend.configuration.Authentication<?> authenticationConfig = configService.getConfig().getAuthentication();
+        final com.hp.autonomy.frontend.configuration.authentication.Authentication<?> authenticationConfig = configService.getConfig().getAuthentication();
         final String authenticationMethod = authenticationConfig.getMethod();
 
         if (!(authenticationConfig instanceof CommunityAuthentication) || LoginTypes.DEFAULT.equals(authenticationMethod)) {
