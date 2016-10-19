@@ -4,11 +4,8 @@
  */
 package com.hp.autonomy.frontend.configuration.authentication;
 
-import com.hp.autonomy.frontend.configuration.AuthenticationConfig;
-import com.hp.autonomy.frontend.configuration.BCryptUsernameAndPassword;
 import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.frontend.configuration.LoginTypes;
-import com.hp.autonomy.frontend.configuration.SingleUserAuthentication;
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -32,7 +29,7 @@ public class SingleUserAuthenticationProvider implements AuthenticationProvider 
 
     @Override
     public Authentication authenticate(final Authentication authentication) throws AuthenticationException {
-        final com.hp.autonomy.frontend.configuration.Authentication<?> configAuthentication = configService.getConfig().getAuthentication();
+        final com.hp.autonomy.frontend.configuration.authentication.Authentication<?> configAuthentication = configService.getConfig().getAuthentication();
 
         if(!(configAuthentication instanceof SingleUserAuthentication) || LoginTypes.DEFAULT.equalsIgnoreCase(configAuthentication.getMethod())) {
             return null;
