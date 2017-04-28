@@ -23,12 +23,16 @@ import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMap
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
 /**
  * A Spring Security {@link AuthenticationProvider} backed by IDOL community.
+ *
+ * The CommunityAuthenticationProvider optionally takes a set of default roles. If this set is non empty, users will be
+ * granted these roles by the application. Otherwise, a {@link BadCredentialsException} will be thrown.
  */
 public class CommunityAuthenticationProvider implements AuthenticationProvider {
     private final ConfigService<? extends AuthenticationConfig<?>> configService;
@@ -36,6 +40,25 @@ public class CommunityAuthenticationProvider implements AuthenticationProvider {
     private final Roles roles;
     private final Set<String> loginPrivileges;
     private final GrantedAuthoritiesMapper authoritiesMapper;
+    private final Set<String> defaultRoles;
+
+    /**
+     * Creates a new CommunityAuthenticationProvider with an empty set of default roles
+     * @param configService The configuration service used for authentication
+     * @param userService The user service used to interact with Community
+     * @param roles The list of Community roles used by the application
+     * @param loginPrivileges The list of privileges a role must have to be allowed to log in to the application
+     * @param authoritiesMapper Mapper used to convert Community roles into GrantedAuthorities
+     */
+    public CommunityAuthenticationProvider(
+        final ConfigService<? extends AuthenticationConfig<?>> configService,
+        final UserService userService,
+        final Roles roles,
+        final Set<String> loginPrivileges,
+        final GrantedAuthoritiesMapper authoritiesMapper
+    ) {
+        this(configService, userService, roles, loginPrivileges,  authoritiesMapper, Collections.<String>emptySet());
+    }
 
     /**
      * Creates a new CommunityAuthenticationProvider
@@ -45,19 +68,22 @@ public class CommunityAuthenticationProvider implements AuthenticationProvider {
      * @param roles             The list of Community roles used by the application
      * @param loginPrivileges   The list of privileges a role must have to be allowed to log in to the application
      * @param authoritiesMapper Mapper used to convert Community roles into GrantedAuthorities
+     * @param defaultRoles Set of default roles to apply if no application roles are found
      */
     public CommunityAuthenticationProvider(
-            final ConfigService<? extends AuthenticationConfig<?>> configService,
-            final UserService userService,
-            final Roles roles,
-            final Set<String> loginPrivileges,
-            final GrantedAuthoritiesMapper authoritiesMapper
+        final ConfigService<? extends AuthenticationConfig<?>> configService,
+        final UserService userService,
+        final Roles roles,
+        final Set<String> loginPrivileges,
+        final GrantedAuthoritiesMapper authoritiesMapper,
+        final Set<String> defaultRoles
     ) {
         this.configService = configService;
         this.userService = userService;
         this.roles = roles;
         this.loginPrivileges = loginPrivileges;
         this.authoritiesMapper = authoritiesMapper;
+        this.defaultRoles = defaultRoles;
     }
 
     @Override
@@ -79,15 +105,27 @@ public class CommunityAuthenticationProvider implements AuthenticationProvider {
                 throw new BadCredentialsException("Bad credentials");
             }
 
-            final UserRoles userRoles = userService.getUser(username);
+            final UserRoles userRoles = userService.getUser(username, true);
+            Set<String> roleNames = new HashSet<>(userRoles.getRoles());
 
-            if (!roles.areRolesAuthorized(new HashSet<>(userRoles.getRoles()), loginPrivileges)) {
-                throw new BadCredentialsException("Bad credentials");
+            if (!roles.areRolesAuthorized(roleNames, loginPrivileges)) {
+                // if we have default roles, grant the user the default roles
+                if(!defaultRoles.isEmpty()) {
+                    roleNames = defaultRoles;
+
+                    // check that the default role names make sense
+                    if (!roles.areRolesAuthorized(roleNames, loginPrivileges)) {
+                        throw new BadCredentialsException("Bad credentials");
+                    }
+                }
+                else {
+                    throw new BadCredentialsException("Bad credentials");
+                }
             }
 
             final Collection<GrantedAuthority> grantedAuthorities = new ArrayList<>();
 
-            for (final String role : userRoles.getRoles()) {
+            for (final String role : roleNames) {
                 grantedAuthorities.add(new SimpleGrantedAuthority(role));
             }
 
