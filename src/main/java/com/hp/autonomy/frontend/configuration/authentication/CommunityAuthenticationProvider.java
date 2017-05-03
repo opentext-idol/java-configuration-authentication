@@ -27,6 +27,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * A Spring Security {@link AuthenticationProvider} backed by IDOL community.
@@ -123,15 +124,11 @@ public class CommunityAuthenticationProvider implements AuthenticationProvider {
                 }
             }
 
-            final Collection<GrantedAuthority> grantedAuthorities = new ArrayList<>();
-
-            for (final String role : roleNames) {
-                grantedAuthorities.add(new SimpleGrantedAuthority(role));
-            }
+            final Collection<GrantedAuthority> grantedAuthorities = roleNames.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList());
 
             final Collection<? extends GrantedAuthority> mappedAuthorities = authoritiesMapper.mapAuthorities(grantedAuthorities);
 
-            return new UsernamePasswordAuthenticationToken(new CommunityPrincipal(userRoles.getUid(), username, userRoles.getSecurityInfo()), password, mappedAuthorities);
+            return new UsernamePasswordAuthenticationToken(new CommunityPrincipal(userRoles.getUid(), username, userRoles.getSecurityInfo(), roleNames), password, mappedAuthorities);
         } catch (final AciErrorException aciError) {
             // This should not happen
             throw new InternalAuthenticationServiceException("An ACI error occurred while attempting to authenticate", aciError);
