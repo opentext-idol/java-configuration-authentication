@@ -36,7 +36,7 @@
         <dependency>
             <groupId>com.hp.autonomy.frontend.user</groupId>
             <artifactId>idol-user-service</artifactId>
-            <version>3.1.0</version>
+            <version>3.1.1</version>
         </dependency>
 
         <dependency>
