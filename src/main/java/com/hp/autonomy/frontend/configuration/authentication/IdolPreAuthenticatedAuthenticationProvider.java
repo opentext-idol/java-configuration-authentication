@@ -56,7 +56,7 @@ public class IdolPreAuthenticatedAuthenticationProvider implements Authenticatio
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toSet());
 
-        final CommunityPrincipal communityPrincipal = new CommunityPrincipal(user.getUid(), username, user.getSecurityInfo(), Collections.emptySet());
+        final CommunityPrincipal communityPrincipal = new CommunityPrincipal(user.getUid(), username, user.getSecurityInfo(), Collections.emptySet(), user.getFields());
         final Collection<? extends GrantedAuthority> authorities = authoritiesMapper.mapAuthorities(grantedAuthorities);
         return new UsernamePasswordAuthenticationToken(communityPrincipal, null, authorities);
     }
