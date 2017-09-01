@@ -9,6 +9,7 @@ import lombok.Data;
 
 import java.io.Serializable;
 import java.security.Principal;
+import java.util.Map;
 import java.util.Set;
 
 @SuppressWarnings("WeakerAccess")
@@ -20,6 +21,7 @@ public class CommunityPrincipal implements Principal, Serializable {
     private final String username;
     private final String securityInfo;
     private final Set<String> idolRoles;
+    private final Map<String, String> fields;
 
     @Override
     public String getName() {
