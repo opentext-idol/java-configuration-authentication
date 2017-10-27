@@ -17,6 +17,6 @@ env:
   # GPG_PASSPHRASE
   - secure: OAPP79UJVrrop3ywpiILXxKUHTo0TI1jEGouWcVssvDvR6pQvuCDTI9DGUmo3/fo7LP8pL0b6yakCsrmqsdQkDaBJptZbxtXubx9RWoxnFFMAYZ0MUa34QGH25WzQF9Qc5cWMojxlcHO2e3UwDWVxvkhkUCPr2YdNbzwSpLJ1bc=
   # GPG_KEYID
-  - secure: GUovBeeEGE+t7oAZRUBwEqX4e9Qgg5ZQrSrJm3Ne/cHSfdadKqbQe6Lj9jGSm2o7qznoF9MtOgux5NuLtboh8lX1/ftvxuPV8svmWDlpF+4CXMo2C6ErN0dCmiM9WA4DWqxqbsSSI4Iubemi382WYbTozmfbkNisUoGm9HQAVek=
+  - GPG_KEYID: 0DD20E21
   # GPG_KEY
   - secure: NAkrcCgVxoq20Mvx4WQhN49zGcRqZK8V4Prsrltjl9eylpjncu/SROcBXFRcwQ/2Xkd/N3WOMDolexnFiYUlwDTlkdIZwPFv8HbsOMNS6Fdr6Tl7quMakLCOr+eArUbKL9uyInuLRGSqDelnoZNJhERVN59w4dC6tQ2pHWUZyTE=
