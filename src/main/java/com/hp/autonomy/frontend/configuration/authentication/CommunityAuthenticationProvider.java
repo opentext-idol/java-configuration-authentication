@@ -112,7 +112,7 @@ public class CommunityAuthenticationProvider implements AuthenticationProvider {
             if (!roles.areRolesAuthorized(roleNames, loginPrivileges)) {
                 // if we have default roles, grant the user the default roles
                 if(!defaultRoles.isEmpty()) {
-                    roleNames = defaultRoles;
+                    roleNames.addAll(defaultRoles);
 
                     // check that the default role names make sense
                     if (!roles.areRolesAuthorized(roleNames, loginPrivileges)) {
