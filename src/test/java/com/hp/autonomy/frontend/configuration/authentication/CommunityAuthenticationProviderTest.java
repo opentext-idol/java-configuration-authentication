@@ -9,6 +9,8 @@ import com.hp.autonomy.frontend.configuration.ConfigService;
 import com.hp.autonomy.frontend.configuration.LoginTypes;
 import com.hp.autonomy.user.UserRoles;
 import com.hp.autonomy.user.UserService;
+import java.util.Arrays;
+import java.util.HashSet;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,6 +31,7 @@ import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsNot.not;
 import static org.mockito.AdditionalAnswers.returnsFirstArg;
 import static org.mockito.Matchers.anyCollection;
 import static org.mockito.Matchers.anySet;
@@ -44,6 +47,7 @@ public class CommunityAuthenticationProviderTest {
     private static final String APP_ROLE = "APP";
     private static final String DEFAULT_ROLE = "DEFAULT";
     private static final String BOGUS_ROLE = "BOGUS";
+    private static final String NEUTRAL_ROLE = "NEUTRAL";
 
     @SuppressWarnings("rawtypes")
     @Mock
@@ -72,6 +76,8 @@ public class CommunityAuthenticationProviderTest {
     private CommunityAuthenticationProvider communityAuthenticationProvider;
 
     private CommunityAuthenticationProvider communityAuthenticationProviderWithDefaultRoles;
+
+    private CommunityAuthenticationProvider communityAuthenticationProviderWithNeutralDefaultRoles;
 
     @SuppressWarnings("unchecked")
     @Before
@@ -109,6 +115,15 @@ public class CommunityAuthenticationProviderTest {
                 loginPrivileges,
                 grantedAuthoritiesMapper,
                 Collections.singleton(DEFAULT_ROLE)
+        );
+
+        communityAuthenticationProviderWithNeutralDefaultRoles = new CommunityAuthenticationProvider(
+                configService,
+                userService,
+                roles,
+                loginPrivileges,
+                grantedAuthoritiesMapper,
+                new HashSet<>(Arrays.asList(NEUTRAL_ROLE, APP_ROLE))
         );
     }
 
@@ -162,6 +177,40 @@ public class CommunityAuthenticationProviderTest {
 
         //noinspection unchecked
         assertThat((Iterable<GrantedAuthority>) authentication.getAuthorities(), hasItem(new SimpleGrantedAuthority(DEFAULT_ROLE)));
+    }
+
+    @Test
+    public void testAuthenticateReturnsCorrectUserWithDefaultRolesAdditively() {
+        final UserRoles userRoles = mock(UserRoles.class);
+        when(userRoles.getRoles()).thenReturn(Collections.singletonList(NEUTRAL_ROLE));
+
+        when(userService.getUser(anyString(), eq(true))).thenReturn(userRoles);
+
+        final Authentication authentication = communityAuthenticationProviderWithDefaultRoles.authenticate(springAuthentication);
+
+        //noinspection unchecked
+        final Iterable<GrantedAuthority> authorities = (Iterable<GrantedAuthority>) authentication.getAuthorities();
+        assertThat(authorities, hasItem(new SimpleGrantedAuthority(DEFAULT_ROLE)));
+        assertThat(authorities, hasItem(new SimpleGrantedAuthority(NEUTRAL_ROLE)));
+    }
+
+    @Test
+    public void testAuthenticateAllowsDecreasingRoles() {
+        // Testing that we can override generous defaults by having just-enough permissions on the user, e.g. if we
+        //   wanted the default Find user to have FindUser,FindBI but a particular user to only have FindUser
+        //   without FindBI.
+        final UserRoles userRoles = mock(UserRoles.class);
+        when(userRoles.getRoles()).thenReturn(Collections.singletonList(APP_ROLE));
+
+        when(userService.getUser(anyString(), eq(true))).thenReturn(userRoles);
+
+        final Authentication authentication = communityAuthenticationProviderWithNeutralDefaultRoles.authenticate(springAuthentication);
+
+        //noinspection unchecked
+        final Iterable<GrantedAuthority> authorities = (Iterable<GrantedAuthority>) authentication.getAuthorities();
+        assertThat(authorities, not(hasItem(new SimpleGrantedAuthority(NEUTRAL_ROLE))));
+        assertThat(authorities, not(hasItem(new SimpleGrantedAuthority(DEFAULT_ROLE))));
+        assertThat(authorities, hasItem(new SimpleGrantedAuthority(APP_ROLE)));
     }
 
     private interface TestAuthenticationConfig extends AuthenticationConfig<TestAuthenticationConfig>{}
