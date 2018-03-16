@@ -21,7 +21,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -112,7 +111,7 @@ public class CommunityAuthenticationProvider implements AuthenticationProvider {
             if (!roles.areRolesAuthorized(roleNames, loginPrivileges)) {
                 // if we have default roles, grant the user the default roles
                 if(!defaultRoles.isEmpty()) {
-                    roleNames = defaultRoles;
+                    roleNames.addAll(defaultRoles);
 
                     // check that the default role names make sense
                     if (!roles.areRolesAuthorized(roleNames, loginPrivileges)) {
