@@ -1,6 +1,6 @@
-# HP Autonomy Authentication
+# Micro Focus Autonomy Authentication
 
-[![Build Status](https://travis-ci.org/hpe-idol/java-configuration-authentication.svg?branch=master)](https://travis-ci.org/hpe-idol/java-configuration-authentication)
+[![Build Status](https://travis-ci.org/microfocus-idol/java-configuration-authentication.svg?branch=master)](https://travis-ci.org/microfocus-idol/java-configuration-authentication)
 
 This library provides user authentication using spring security.
 
