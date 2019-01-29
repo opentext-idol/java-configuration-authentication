@@ -148,7 +148,7 @@ public class CommunityAuthenticationProviderTest {
         final UserRoles userRoles = mock(UserRoles.class);
         when(userRoles.getRoles()).thenReturn(Collections.singletonList(BOGUS_ROLE));
 
-        when(userService.getUser(anyString(), eq(true))).thenReturn(userRoles);
+        when(userService.getUser(anyString(), eq(true), anyString())).thenReturn(userRoles);
 
         communityAuthenticationProvider.authenticate(springAuthentication);
     }
@@ -158,7 +158,7 @@ public class CommunityAuthenticationProviderTest {
         final UserRoles userRoles = mock(UserRoles.class);
         when(userRoles.getRoles()).thenReturn(Collections.singletonList(APP_ROLE));
 
-        when(userService.getUser(anyString(), eq(true))).thenReturn(userRoles);
+        when(userService.getUser(anyString(), eq(true), anyString())).thenReturn(userRoles);
 
         final Authentication authentication = communityAuthenticationProvider.authenticate(springAuthentication);
 
@@ -171,7 +171,7 @@ public class CommunityAuthenticationProviderTest {
         final UserRoles userRoles = mock(UserRoles.class);
         when(userRoles.getRoles()).thenReturn(Collections.<String>emptyList());
 
-        when(userService.getUser(anyString(), eq(true))).thenReturn(userRoles);
+        when(userService.getUser(anyString(), eq(true), anyString())).thenReturn(userRoles);
 
         final Authentication authentication = communityAuthenticationProviderWithDefaultRoles.authenticate(springAuthentication);
 
@@ -184,7 +184,7 @@ public class CommunityAuthenticationProviderTest {
         final UserRoles userRoles = mock(UserRoles.class);
         when(userRoles.getRoles()).thenReturn(Collections.singletonList(NEUTRAL_ROLE));
 
-        when(userService.getUser(anyString(), eq(true))).thenReturn(userRoles);
+        when(userService.getUser(anyString(), eq(true), anyString())).thenReturn(userRoles);
 
         final Authentication authentication = communityAuthenticationProviderWithDefaultRoles.authenticate(springAuthentication);
 
@@ -202,7 +202,7 @@ public class CommunityAuthenticationProviderTest {
         final UserRoles userRoles = mock(UserRoles.class);
         when(userRoles.getRoles()).thenReturn(Collections.singletonList(APP_ROLE));
 
-        when(userService.getUser(anyString(), eq(true))).thenReturn(userRoles);
+        when(userService.getUser(anyString(), eq(true), anyString())).thenReturn(userRoles);
 
         final Authentication authentication = communityAuthenticationProviderWithNeutralDefaultRoles.authenticate(springAuthentication);
 

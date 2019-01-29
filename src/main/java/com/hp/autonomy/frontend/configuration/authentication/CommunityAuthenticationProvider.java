@@ -105,7 +105,7 @@ public class CommunityAuthenticationProvider implements AuthenticationProvider {
                 throw new BadCredentialsException("Bad credentials");
             }
 
-            final UserRoles userRoles = userService.getUser(username, true);
+            final UserRoles userRoles = userService.getUser(username, true, password);
             Set<String> roleNames = new HashSet<>(userRoles.getRoles());
 
             if (!roles.areRolesAuthorized(roleNames, loginPrivileges)) {
