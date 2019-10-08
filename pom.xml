@@ -31,12 +31,12 @@
         <dependency>
             <groupId>com.hp.autonomy.frontend.configuration</groupId>
             <artifactId>configuration-idol</artifactId>
-            <version>5.7.4</version>
+            <version>5.8.0</version>
         </dependency>
         <dependency>
             <groupId>com.hp.autonomy.frontend.user</groupId>
             <artifactId>idol-user-service</artifactId>
-            <version>3.8.2</version>
+            <version>3.9.0</version>
         </dependency>
 
         <dependency>
