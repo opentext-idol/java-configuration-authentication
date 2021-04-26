@@ -17,6 +17,7 @@ package com.hp.autonomy.frontend.configuration.authentication;
 import com.autonomy.aci.client.services.AciErrorException;
 import com.hp.autonomy.user.UserRoles;
 import com.hp.autonomy.user.UserService;
+import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -31,12 +32,10 @@ import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMap
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 
 import java.security.Principal;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
+import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -49,24 +48,22 @@ public class IdolPreAuthenticatedAuthenticationProviderTest {
     private static final String SAMPLE_USER = "some_user";
 
     private AuthenticationProvider authenticationProvider;
-
-    @Mock
-    private UserService userService;
-
-    @Mock
-    private GrantedAuthoritiesMapper authoritiesMapper;
-
-    @Mock
-    private Authentication authentication;
-
-    @Mock
-    private Principal principal;
+    @Mock private UserService userService;
+    @Mock private GrantedAuthoritiesMapper authoritiesMapper;
+    @Mock private Authentication authentication;
+    @Mock private Principal principal;
+    private UserRoles testUser;
+    private Set<String> testRoles;
 
     @SuppressWarnings("unchecked")
     @Before
     public void setUp() {
         when(authentication.getPrincipal()).thenReturn(principal);
         when(principal.toString()).thenReturn(SAMPLE_USER);
+        testUser = new UserRoles(SAMPLE_USER, 123, "security-info",
+            Arrays.asList("UserRoleA", "UserRoleB"),
+            Collections.singletonMap("field", "val"));
+        testRoles = new HashSet<>(Arrays.asList("FixedRoleA", "FixedRoleB"));
 
         when(authoritiesMapper.mapAuthorities(any())).thenAnswer(invocation -> ((Collection<? extends GrantedAuthority>) invocation.getArgumentAt(0, Collection.class))
                 .stream()
@@ -74,18 +71,58 @@ public class IdolPreAuthenticatedAuthenticationProviderTest {
                 .collect(Collectors.toList()));
 
         authenticationProvider = new IdolPreAuthenticatedAuthenticationProvider(
-                userService,
-                authoritiesMapper,
-                new HashSet<>(Arrays.asList("SomeRole", "SomeOtherRole"))
-        );
+            userService, authoritiesMapper, testRoles, true);
     }
 
     @Test
     public void authenticateWithExistingUser() {
-        when(userService.getUser(SAMPLE_USER, true)).thenReturn(new UserRoles(SAMPLE_USER));
+        when(userService.getUser(SAMPLE_USER, true)).thenReturn(testUser);
         final Authentication communityAuthentication = authenticationProvider.authenticate(authentication);
+
         assertTrue(communityAuthentication.isAuthenticated());
         assertThat(communityAuthentication.getAuthorities(), hasSize(2));
+        assertThat(communityAuthentication.getPrincipal(), instanceOf(CommunityPrincipal.class));
+
+        final CommunityPrincipal principal =
+            (CommunityPrincipal) communityAuthentication.getPrincipal();
+        assertThat(principal.getId(), equalTo(123L));
+        assertThat(principal.getUsername(), equalTo(SAMPLE_USER));
+        assertThat(principal.getSecurityInfo(), equalTo("security-info"));
+        assertThat(principal.getIdolRoles(),
+            equalTo(new HashSet<>(Arrays.asList("FixedRoleA", "FixedRoleB"))));
+        assertThat(principal.getFields(), equalTo(Collections.singletonMap("field", "val")));
+    }
+
+    @Test
+    public void authenticateWithNoPreauthenticatedRoles() {
+        authenticationProvider = new IdolPreAuthenticatedAuthenticationProvider(
+            userService, authoritiesMapper, Collections.emptySet(), true);
+        when(userService.getUser(SAMPLE_USER, true)).thenReturn(testUser);
+        final Authentication communityAuthentication =
+            authenticationProvider.authenticate(authentication);
+
+        assertTrue(communityAuthentication.isAuthenticated());
+        assertThat(communityAuthentication.getAuthorities(), hasSize(2));
+        assertThat(communityAuthentication.getPrincipal(), instanceOf(CommunityPrincipal.class));
+        final CommunityPrincipal principal =
+            (CommunityPrincipal) communityAuthentication.getPrincipal();
+        assertThat(principal.getIdolRoles(),
+            equalTo(new HashSet<>(Arrays.asList("UserRoleA", "UserRoleB"))));
+    }
+
+    @Test
+    public void authenticateWithPasswordNotRequired() {
+        authenticationProvider = new IdolPreAuthenticatedAuthenticationProvider(
+            userService, authoritiesMapper, testRoles, false);
+        when(userService.getUser(SAMPLE_USER, true, null)).thenReturn(testUser);
+        final Authentication communityAuthentication =
+            authenticationProvider.authenticate(authentication);
+
+        assertTrue(communityAuthentication.isAuthenticated());
+        assertThat(communityAuthentication.getPrincipal(), instanceOf(CommunityPrincipal.class));
+        final CommunityPrincipal principal =
+            (CommunityPrincipal) communityAuthentication.getPrincipal();
+        assertThat(principal.getUsername(), equalTo(SAMPLE_USER));
     }
 
     @Test(expected = BadCredentialsException.class)
