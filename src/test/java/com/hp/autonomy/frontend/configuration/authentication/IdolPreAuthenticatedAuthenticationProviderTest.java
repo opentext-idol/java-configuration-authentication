@@ -17,12 +17,11 @@ package com.hp.autonomy.frontend.configuration.authentication;
 import com.autonomy.aci.client.services.AciErrorException;
 import com.hp.autonomy.user.UserRoles;
 import com.hp.autonomy.user.UserService;
-import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -39,7 +38,7 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -65,7 +64,7 @@ public class IdolPreAuthenticatedAuthenticationProviderTest {
             Collections.singletonMap("field", "val"));
         testRoles = new HashSet<>(Arrays.asList("FixedRoleA", "FixedRoleB"));
 
-        when(authoritiesMapper.mapAuthorities(any())).thenAnswer(invocation -> ((Collection<? extends GrantedAuthority>) invocation.getArgumentAt(0, Collection.class))
+        when(authoritiesMapper.mapAuthorities(any())).thenAnswer(invocation -> ((Collection<? extends GrantedAuthority>) invocation.getArgument(0, Collection.class))
                 .stream()
                 .map(x -> mock(GrantedAuthority.class))
                 .collect(Collectors.toList()));

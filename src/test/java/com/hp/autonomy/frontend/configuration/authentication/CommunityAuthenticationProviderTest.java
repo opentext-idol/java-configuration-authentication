@@ -26,7 +26,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -42,13 +42,10 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
 import static org.mockito.AdditionalAnswers.returnsFirstArg;
-import static org.mockito.Matchers.anyCollection;
-import static org.mockito.Matchers.anySet;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.argThat;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static org.mockito.hamcrest.MockitoHamcrest.argThat;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CommunityAuthenticationProviderTest {
@@ -102,7 +99,7 @@ public class CommunityAuthenticationProviderTest {
         when(roles.areRolesAuthorized((Set<String>) argThat(Matchers.hasItem(DEFAULT_ROLE)), anySet())).thenReturn(true);
         when(roles.areRolesAuthorized((Set<String>) argThat(Matchers.hasItem(BOGUS_ROLE)), anySet())).thenReturn(false);
 
-        when(springAuthentication.getPrincipal()).thenReturn("username");
+        when(springAuthentication.getName()).thenReturn("username");
         when(springAuthentication.getCredentials()).thenReturn("password");
 
         when(userService.authenticateUser(anyString(), anyString(), anyString())).thenReturn(true);

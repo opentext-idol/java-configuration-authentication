@@ -16,7 +16,6 @@ package com.hp.autonomy.frontend.configuration.authentication;
 
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
-import org.hamcrest.Factory;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -197,7 +196,6 @@ public class RoleTest {
             this.privileges = privilege;
         }
 
-        @Factory
         static AuthorizedMatcher isAuthorizedFor(final String... privileges) {
             return new AuthorizedMatcher(privileges);
         }
