@@ -26,6 +26,9 @@ import java.util.Set;
 public class CommunityPrincipal implements Principal, Serializable {
     private static final long serialVersionUID = -8625590848187633506L;
 
+    /**
+     * Note: may not be present when using Community behind DAH.
+     */
     private final long id;
     private final String username;
     private final String securityInfo;
