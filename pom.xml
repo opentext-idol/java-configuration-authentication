@@ -41,7 +41,7 @@
         <dependency>
             <groupId>com.hp.autonomy.frontend.configuration</groupId>
             <artifactId>configuration-idol</artifactId>
-            <version>6.0.0</version>
+            <version>6.1.0</version>
         </dependency>
         <dependency>
             <groupId>com.hp.autonomy.frontend.configuration</groupId>
@@ -51,7 +51,7 @@
         <dependency>
             <groupId>com.hp.autonomy.frontend.user</groupId>
             <artifactId>idol-user-service</artifactId>
-            <version>4.0.0</version>
+            <version>4.1.0</version>
         </dependency>
         <dependency>
             <groupId>org.mindrot</groupId>
