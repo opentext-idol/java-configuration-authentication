@@ -14,6 +14,10 @@
     <artifactId>configuration-authentication</artifactId>
     <version>1.7.0</version>
 
+    <name>OpenText IDOL Configuration Authentication</name>
+    <description>This library provides user authentication using spring security</description>
+    <url>https://github.com/opentext-idol/java-configuration-authentication</url>
+
     <inceptionYear>2015</inceptionYear>
 
     <scm>
